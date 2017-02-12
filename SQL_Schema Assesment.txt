@@ -1,0 +1,29 @@
+Logical Deletes to tables:
+
+alter table drug add flag integer;
+alter table medicationorder add flag integer default "0";
+alter table ordercatalog add flag integer default "0";
+alter table person add flag integer default "0";
+alter table interaction add flag integer default "0";
+
+
+
+Schema that supports interaction if more than 2 drugs:
+create table new_interaction(Interaction_Id integer Primary Key,Outcome TEXT Not Null,Flag integer default "0"
+);
+
+To add n number of drugs for one interaction:
+create table merge_interaction_drug(Merge_Id integer Primary Key, DrugId integer,foreign key(DrugId) references drug(DrugId));
+
+To map the Interaction with Drug specified
+create table map_interaction_drug(Interaction_Id integer Not Null,Merge_Id integer Not Null, foreign key(Interaction_Id) references new_interaction(Interaction_Id),foreign key(Merge_Id) references merge_interaction_drug(Merge_Id),Primary Key(Interaction_Id,Merge_Id)); 
+
+
+Statements that are required to maintain the data:
+insert into new_interaction values("1","liver damage","0");
+insert into new_interaction values("2","irregular heart rhythm","0");
+
+insert into merge_interaction_drug values("1","1");
+insert into merge_interaction_drug values("2","2");
+
+insert into map_interaction_drug values("1","2");
